@@ -6,25 +6,23 @@
     {{ session('status') }}
 </div>
 @endif
-<div class="my-3 col-2 float-end">
-    <label for="filterStudents" class="form-label">Filter Students</label>
+<div class="m-auto col-3 text-center">
+<h5 for="filterStudents" class="form-label">Filter Students</h5>
     <form method="POST" action="{{ route('filter') }}">
         @csrf
         <select id="filter" class="form-select" name="filter">
+            <option selected>sort by student type...</option>
             <option value="all">all students</option>
             <option value="local">local student</option>
             <option value="foreign">foreign student</option>
         </select>
-        <button type="submit" class="btn btn-primary">apply</button>
+        <button type="submit" class="btn btn-primary col-6 text-center mt-2">apply</button>
     </form>
-
 </div>
 <div class="container" style="max-width: 100rem;">
-    <h1 class="text-center">STUDENTS LIST</h1>
+    <h1>STUDENTS LIST</h1>
     <a href="{{ route('create') }}" class="btn btn-success mb-3">Add Student</a>
-
     <div class="row justify-content-center">
-
         <table class="table">
             <thead>
                 <tr>

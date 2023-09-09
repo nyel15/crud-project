@@ -30,16 +30,16 @@ class HomeController extends Controller
     public function index()
     {  
         $students = [];
-        $var = AllStudents::get();
-        foreach($var as $student){
-            $local_id = $student->local_student_id;
+        $allstudents = AllStudents::get();
+        foreach($allstudents as $student){
+            $localStudentId = $student->local_student_id;
             $id = $student->id;
-            if($local_id != null){
-                $val = AllStudents::find($id)->localStudents;
-                array_push($students, $val);
+            if($localStudentId != null){
+                $result = AllStudents::find($id)->localStudents;
+                array_push($students, $result);
             }else{
-                $val = AllStudents::find($id)->foreignStudents;
-                array_push($students, $val);
+                $result = AllStudents::find($id)->foreignStudents;
+                array_push($students, $result);
             }
         }
         return view('home', compact('students')); 
