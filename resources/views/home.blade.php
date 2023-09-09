@@ -19,11 +19,11 @@
         <button type="submit" class="btn btn-primary col-6 text-center mt-2">apply</button>
     </form>
 </div>
-<div class="container" style="max-width: 100rem;">
+<div class="container" style="max-width: 90rem;">
     <h1>STUDENTS LIST</h1>
     <a href="{{ route('create') }}" class="btn btn-success mb-3">Add Student</a>
     <div class="row justify-content-center">
-        <table class="table">
+        <table class="table table-light">
             <thead>
                 <tr>
                     <th scope="col">STUDENT TYPE</th>
@@ -52,14 +52,15 @@
                     <td>{{ number_format($student->grades, 2) }}</td>
                     <td>{{ $student->email }}</td>
                     <td>
-                        <a href="/update/{{ $student->student_type }}/{{ $student->id }}"
-                            class="btn btn-primary col-12">Edit</a>
+                        <a href="/update/{{ $student->student_type }}/{{ $student->id }}" class="btn btn-primary col-12">Edit</a>
+                    </td>
+                    <td>
                         <form action="{{ route('delete') }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" value="{{ $student->id }}" name="id">
                             <input type="hidden" value="{{ $student->student_type }}" name="student_type">
-                            <button type="submit" class="btn btn-danger col-12 mt-2"
+                            <button type="submit" class="btn btn-danger col-12"
                                 onclick="return confirm('Do you want to delete?')">Delete</button>
                         </form>
                     </td>

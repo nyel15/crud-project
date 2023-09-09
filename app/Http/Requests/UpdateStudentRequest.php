@@ -25,9 +25,9 @@ class UpdateStudentRequest extends FormRequest
     {
         return [
             'studentType' => 'bail|required',
-            'idNumber' => 'bail|required|numeric|digits_between:1,5|unique:local_students,id_number|unique:foreign_students,id_number',
+            'idNumber' => 'bail|required|numeric|digits_between:1,5',
             'name' => 'bail|required',
-            'age' => 'bail|required|numeric|digits_between:1,2',
+            'age' => 'bail|required|numeric|digits_between:1,2|regex:/^[^.]+$/',
             'gender' => 'bail|nullable',
             'city' => 'bail|required',
             'mobileNumber' => 'bail|required|numeric|regex:/^(09)\\d{9}$/',

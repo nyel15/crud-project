@@ -10,9 +10,9 @@
 </head>
 
 <body>
-    <div class="container mt-5" style="max-width: 1000px;">
-        <h1>Update Student Information <a href="{{ route('home') }}" class="btn btn-primary col-1 float-end">Back</a>
-        </h1>
+    <div class="container update-container mt-5">
+        <a href="{{ route('home') }}" class="btn btn-primary col-2 float-end">Back</a>
+        <h3>Update Student Information</h3>
         <form action="{{ route('update',  $student->id) }}" method="POST" class="row g-3 mt-3">
             @csrf
             @method('PUT')

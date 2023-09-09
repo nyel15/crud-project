@@ -32,7 +32,7 @@ class HomeController extends Controller
         $students = [];
         $allstudents = AllStudents::get();
         foreach($allstudents as $student){
-            $localStudentId = $student->local_student_id;
+            $localStudentId = $student->local_student_id;   
             $id = $student->id;
             if($localStudentId != null){
                 $result = AllStudents::find($id)->localStudents;

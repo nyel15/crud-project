@@ -10,9 +10,10 @@
 </head>
 
 <body>
-    <div class="container mt-5" style="max-width: 1000px;">
-        <h1>Create Student Information <a href="{{ route('home') }}" class="btn btn-primary col-1 float-end">Back</a>
-        </h1>
+    <div class="container create-container mt-5">
+        <a href="{{ route('home') }}" class="btn btn-primary col-2 float-end">Back</a>
+        <h3>Create Student Information</h3>
+        
         <form action="{{ route('store') }}" method="POST" class="row g-3 mt-3">
             @csrf
             <div class="col-6">
