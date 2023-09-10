@@ -26,7 +26,7 @@ class StoreStudentRequest extends FormRequest
     {
         return [
             'studentType' => 'bail|required',
-            'idNumber' => 'bail|required|numeric|digits_between:1,5|unique:local_students,id_number|unique:foreign_students,id_number',
+            'idNumber' => 'bail|required|numeric|digits_between:1,5|unique:local_students,id_number|unique:foreign_students,id_number|regex:/^[^.]+$/',
             'name' => 'bail|required',
             'age' => 'bail|required|numeric|digits_between:1,2|regex:/^[^.]+$/',
             'gender' => 'bail|nullable',
@@ -40,7 +40,8 @@ class StoreStudentRequest extends FormRequest
     public function messages(){
         return[
             'idNumber.digits_between' => 'The id number should not exceed by 5 digits',
-            'age.digits_between' => 'The age shoud not exceeded by 2 digits'
+            'age.digits_between' => 'The age shoud not exceeded by 2 digits',
+            'mobileNumber.regex' => 'The mobile number must start with 09 and exactly 11 digits'
         ];
     }
 }

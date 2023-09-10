@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     <title>Create</title>
 </head>
 
@@ -19,10 +20,10 @@
             <div class="col-6">
                 <label for="inputStudentType" class="form-label">Student type</label>
                 <select id="inputStudentType" class="form-select @error('studentType') border-danger @enderror"
-                    name="studentType" placeholder="choose...">
-                    <option selected></option>
-                    <option @if (old('studentType')=='local' ) selected @endif>local</option>
-                    <option @if (old('studentType')=='foreign' ) selected @endif>foreign</option>
+                    name="studentType">
+                    <option disabled selected>Select student type</option>
+                    <option {{ old('studentType') == 'local' ? 'selected' : '' }}>local</option>
+                    <option {{ old('studentType') == 'foreign' ? 'selected' : '' }}>foreign</option>
                 </select>
                 @error('studentType')
                 <p style="color: red;">{{ $errors->first('studentType') }}</p>
@@ -44,7 +45,7 @@
                 <p style="color: red;">{{ $errors->first('name') }}</p>
                 @enderror
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <label for="inputAge" class="form-label">Age</label>
                 <input type="text" class="form-control @error('age') border-danger @enderror" id="inputAge" name="age"
                     value="{{ old('age') }}">
@@ -52,12 +53,12 @@
                 <p style="color: red;">{{ $errors->first('age') }}</p>
                 @enderror
             </div>
-            <div class="col-3">
+            <div class="col-4">
                 <label for="inputGender" class="form-label">Gender</label>
                 <select id="inputGender" class="form-select" name="gender" value="{{ old('gender') }}">
-                    <option selected></option>
-                    <option @if (old('gender')=='male' ) selected @endif>male</option>
-                    <option @if (old('gender')=='female' ) selected @endif>female</option>
+                    <option disabled selected>optional</option>
+                    <option {{ old('gender') == 'male' ? 'selected' : ''}}>male</option>
+                    <option {{ old('gender') == 'female' ? 'selected' : ''}}>female</option>
                 </select>
             </div>
             <div class="col-8">
