@@ -10,4 +10,6 @@ class LocalStudents extends Model
         return $this->hasMany(AllStudents::class);
     }
     
+    protected $table = 'local_students';
+    protected $fillable = ['student_type', 'id_number', 'name', 'age', 'gender', 'city', 'mobile_number', 'grades', 'email'];
 }

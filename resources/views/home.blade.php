@@ -2,22 +2,26 @@
 
 @section('content')
 @if(session('status'))
-<div class="container float-end" style="width: 15rem;">
+<div class="container float-end" style="width: 20rem;">
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" viewBox="0 0 16 16">
-            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            <path
+                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
         </symbol>
     </svg>
-    <div class="alert alert-success d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+    <div class="alert myAlert alert-success d-flex align-items-center alert-dismissible" role="alert">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
+            <use xlink:href="#check-circle-fill" />
+        </svg>
         <div>
-        {{ session('status') }}
+            {{ session('status') }}
         </div>
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     </div>
 </div>
 @endif
 <div class="m-auto col-3 text-center">
-<h5 for="filterStudents" class="form-label">Filter Students</h5>
+    <h5 for="filterStudents" class="form-label">Filter Students</h5>
     <form method="GET" action="{{ route('home') }}" class="filterForm">
         @csrf
         <select class="form-select" name="filter" onchange="document.querySelector('.filterForm').submit();">
@@ -27,10 +31,10 @@
         </select>
     </form>
 </div>
-<div class="container" style="max-width: 90rem;">
+<div class="container students-container">
     <h1>STUDENTS LIST</h1>
     <a href="{{ route('create') }}" class="btn btn-success mb-3">Add Student</a>
-    <div class="row justify-content-center">
+    <div class="row justify-content-center studentsContainer">
         <table class="table table-light">
             <thead>
                 <tr>
@@ -44,6 +48,7 @@
                     <th scope="col">GRADES</th>
                     <th scope="col">EMAIL</th>
                     <th scope="col">ACTIONS</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -60,7 +65,8 @@
                     <td>{{ number_format($student->grades, 2) }}</td>
                     <td>{{ $student->email }}</td>
                     <td>
-                        <a href="/update/{{ $student->student_type }}/{{ $student->id }}" class="btn btn-primary col-12">Edit</a>
+                        <a href="/edit/{{ $student->student_type }}/{{ $student->id }}"
+                            class="btn btn-primary col-12">Edit</a>
                     </td>
                     <td>
                         <form action="{{ route('delete') }}" method="POST">
@@ -78,9 +84,9 @@
         </table>
     </div>
 </div>
-<script type="text/javascript">
+<script>
 setTimeout(() => {
-    $('.alert').alert('close');
-}, 3000);
+    $('.myAlert').alert('close');
+}, 2000);
 </script>
 @endsection

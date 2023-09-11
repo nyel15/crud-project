@@ -12,77 +12,70 @@
 
 <body>
     <div class="container update-container mt-5">
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <a href="{{ route('home') }}" class="btn btn-primary col-2 float-end">Back</a>
         <h3>Update Student Information</h3>
-        <form action="{{ route('update',  $student->id) }}" method="POST" class="row g-3 mt-3">
+        <form action="{{ route('update', [$student->id, $student->student_type]) }}" method="POST" class="row g-3 mt-3">
             @csrf
             @method('PUT')
             <div class="col-6">
                 <label for="inputStudentType" class="form-label">Student type</label>
-                <select id="inputStudentType" class="form-select @error('studentType') border-danger @enderror"
-                    name="studentType">
-                    <option value="local" {{ old('studentType', $student->student_type) == 'local' ? 'selected' : '' }}>local</option>
-                    <option value="foreign" {{ old('studentType', $student->student_type) == 'foreign' ? 'selected' : '' }}>foreign</option>
+                <select id="inputStudentType" class="form-select @error('student_type') border-danger @enderror"
+                    name="student_type">
+                    <option value="local"
+                        {{ old('student_type', $student->student_type) == 'local' ? 'selected' : '' }}>
+                        local</option>
+                    <option value="foreign"
+                        {{ old('student_type', $student->student_type) == 'foreign' ? 'selected' : '' }}>foreign
+                    </option>
                 </select>
-                @error('studentType')
-                <p style="color: red;">{{ $errors->first('studentType') }}</p>
-                @enderror
             </div>
             <div class="col-6">
                 <label for="inputIdNumber" class="form-label">ID number</label>
-                <input type="text" class="form-control @error('idNumber') border-danger @enderror" id="inputIdNumber"
-                    name="idNumber" value="{{ ($student->id_number) }}">
-                @error('idNumber')
-                <p style="color: red;">{{ $errors->first('idNumber') }}</p>
-                @enderror
+                <input type="text" class="form-control @error('id_number') border-danger @enderror" id="inputIdNumber"
+                    name="id_number" value="{{ ($student->id_number) }}">
             </div>
             <div class="col-6">
                 <label for="inputName" class="form-label">Name</label>
                 <input type="text" class="form-control @error('name') border-danger @enderror" id="inputName"
                     name="name" value="{{ ($student->name) }}">
-                @error('name')
-                <p style="color: red;">{{ $errors->first('name') }}</p>
-                @enderror
             </div>
             <div class="col-2">
                 <label for="inputAge" class="form-label">Age</label>
                 <input type="text" class="form-control @error('age') border-danger @enderror" id="inputAge" name="age"
                     value="{{ ($student->age) }}">
-                @error('age')
-                <p style="color: red;">{{ $errors->first('age') }}</p>
-                @enderror
             </div>
             <div class="col-4">
                 <label for="inputGender" class="form-label">Gender</label>
                 <select id="inputGender" class="form-select" name="gender" value="{{ old('gender') }}">
                     <option disabled selected>Select gender</option>
                     <option value="male" {{ old('gender', $student->gender) == 'male' ? 'selected' : '' }}>male</option>
-                    <option value="female" {{ old('gender', $student->gender) == 'female' ? 'selected' : '' }}>female</option>
+                    <option value="female" {{ old('gender', $student->gender) == 'female' ? 'selected' : '' }}>female
+                    </option>
                 </select>
             </div>
             <div class="col-8">
                 <label for="inputCity" class="form-label">City</label>
                 <input type="text" class="form-control @error('city') border-danger @enderror" id="inputCity"
                     name="city" value="{{ ($student->city) }}">
-                @error('city')
-                <p style="color: red;">{{ $errors->first('city') }}</p>
-                @enderror
             </div>
             <div class="col-4">
                 <label for="inputMobileNumber" class="form-label">Mobile number</label>
-                <input type="text" class="form-control @error('mobileNumber') border-danger @enderror"
-                    id="inputMobileNumber" name="mobileNumber" value="{{ ($student->mobile_number) }}">
-                @error('mobileNumber')
-                <p style="color: red;">{{ $errors->first('mobileNumber') }}</p>
-                @enderror
+                <input type="text" class="form-control @error('mobile_number') border-danger @enderror"
+                    id="inputMobileNumber" name="mobile_number" value="{{ ($student->mobile_number) }}">
             </div>
             <div class="col-8">
                 <label for="inputEmail" class="form-label">Email</label>
                 <input type="text" class="form-control @error('email') border-danger @enderror" id="inputEmail"
                     name="email" value="{{ ($student->email) }}">
-                @error('email')
-                <p style="color: red;">{{ $errors->first('email') }}</p>
-                @enderror
             </div>
             <div class="col-4">
                 <label for="inputGrades" class="form-label">Grades</label>

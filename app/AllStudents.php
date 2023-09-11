@@ -12,4 +12,6 @@ class AllStudents extends Model
     public function foreignStudents(){
         return $this->belongsTo(ForeignStudents::class, 'foreign_student_id');
     }
+
+    protected $table = 'all_students';
 }

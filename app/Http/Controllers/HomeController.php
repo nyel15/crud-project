@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\AllStudents;
 use App\LocalStudents;
 use App\ForeignStudents;
-use App\Http\Requests\StoreStudentRequest;
-use App\Http\Requests\UpdateStudentRequest;
+use App\Http\Requests\StudentRequest;
 use Illuminate\Http\Request;
 
 
@@ -52,37 +51,37 @@ class HomeController extends Controller
         return view('create');
     }
     
-    public function store(StoreStudentRequest $request){
+    public function store(StudentRequest $request){
         $request->validated();
         
-        if(request('studentType') === 'local'){
+        if($request->student_type == 'local'){
             $localStudent = new LocalStudents();
-            $localStudent->student_type = request('studentType');
-            $localStudent->id_number = request('idNumber');
-            $localStudent->name = request('name');
-            $localStudent->age = request('age');
-            $localStudent->gender = request('gender');
-            $localStudent->city = request('city');
-            $localStudent->mobile_number = request('mobileNumber');
-            $localStudent->grades = request('grades');
-            $localStudent->email = request('email');
+            $localStudent->student_type = $request->student_type;
+            $localStudent->id_number = $request->id_number;
+            $localStudent->name = $request->name;
+            $localStudent->age = $request->age;
+            $localStudent->gender = $request->gender;
+            $localStudent->city = $request->city;
+            $localStudent->mobile_number = $request->mobile_number;
+            $localStudent->grades = $request->grades;
+            $localStudent->email = $request->email;
             $localStudent->save();
         } else {
             $foreignStudent = new ForeignStudents();
-            $foreignStudent->student_type = request('studentType');
-            $foreignStudent->id_number = request('idNumber');
-            $foreignStudent->name = request('name');
-            $foreignStudent->age = request('age');
-            $foreignStudent->gender = request('gender');
-            $foreignStudent->city = request('city');
-            $foreignStudent->mobile_number = request('mobileNumber');
-            $foreignStudent->grades = request('grades');
-            $foreignStudent->email = request('email');
+            $foreignStudent->student_type = $request->student_type;
+            $foreignStudent->id_number = $request->id_number;
+            $foreignStudent->name = $request->name;
+            $foreignStudent->age = $request->age;
+            $foreignStudent->gender = $request->gender;
+            $foreignStudent->city = $request->city;
+            $foreignStudent->mobile_number = $request->mobile_number;
+            $foreignStudent->grades = $request->grades;
+            $foreignStudent->email = $request->email;
             $foreignStudent->save();
         }
         
         $allStudent = new AllStudents();
-        $allStudent->student_type = request('studentType');
+        $allStudent->student_type = $request->student_type;
         $allStudent->student_type == 'local' ? $allStudent->local_student_id = $localStudent->id : '';
         $allStudent->student_type == 'foreign' ? $allStudent->foreign_student_id = $foreignStudent->id : '';
         $allStudent->save();
@@ -102,33 +101,52 @@ class HomeController extends Controller
         return view('update', compact('student'));
     }
     
-    public function update($id, UpdateStudentRequest $request){
+    public function update($id, $student_type, StudentRequest $request){
         $request->validated();
 
-        if(request('studentType') == 'local'){
-            $localStudent = LocalStudents::findOrFail($id);
-            $localStudent->student_type = request('studentType');
-            $localStudent->id_number = request('idNumber');
-            $localStudent->name = request('name');
-            $localStudent->age = request('age');
-            $localStudent->gender = request('gender');
-            $localStudent->city = request('city');
-            $localStudent->mobile_number = request('mobileNumber');
-            $localStudent->grades = request('grades');
-            $localStudent->email = request('email');
-            $localStudent->save();
-        }else{
-            $foreignStudent = ForeignStudents::findOrFail($id);
-            $foreignStudent->student_type = request('studentType');
-            $foreignStudent->id_number = request('idNumber');
-            $foreignStudent->name = request('name');
-            $foreignStudent->age = request('age');
-            $foreignStudent->gender = request('gender');
-            $foreignStudent->city = request('city');
-            $foreignStudent->mobile_number = request('mobileNumber');
-            $foreignStudent->grades = request('grades');
-            $foreignStudent->email = request('email');
-            $foreignStudent->save();
+        if($student_type == 'local'){
+            $student = LocalStudents::findOrFail($id);
+            if($request->student_type != 'local'){
+                $student->delete();
+                $foreignStudent = ForeignStudents::create($request->all());
+                $allStudent = new AllStudents();
+                $allStudent->student_type = $request->student_type;
+                $allStudent->student_type == 'foreign' ? $allStudent->foreign_student_id = $foreignStudent->id : '';
+                $allStudent->save();
+            }else{
+                $student->student_type = $request->student_type;
+                $student->id_number = $request->id_number;
+                $student->name = $request->name;
+                $student->age = $request->age;
+                $student->gender = $request->gender;
+                $student->city = $request->city;
+                $student->mobile_number = $request->mobile_number;
+                $student->grades = $request->grades;
+                $student->email = $request->email;
+                $student->update();
+            }
+        }
+        elseif($student_type == 'foreign'){
+            $student = ForeignStudents::findOrFail($id);
+            if($request->student_type != 'foreign'){
+                $student->delete();
+                $localStudents = LocalStudents::create($request->all());
+                $allStudent = new AllStudents();
+                $allStudent->student_type = $request->student_type;
+                $allStudent->student_type == 'local' ? $allStudent->local_student_id = $localStudents->id : '';
+                $allStudent->save();
+            }else{
+                $student->student_type = $request->student_type;
+                $student->id_number = $request->id_number;
+                $student->name = $request->name;
+                $student->age = $request->age;
+                $student->gender = $request->gender;
+                $student->city = $request->city;
+                $student->mobile_number = $request->mobile_number;
+                $student->grades = $request->grades;
+                $student->email = $request->email;
+                $student->update();
+            }
         }
         
         return redirect()->route('home')->with('status', 'update successful');
@@ -138,7 +156,7 @@ class HomeController extends Controller
         if($request->student_type == 'local'){
             $student = LocalStudents::findOrFail($request->id);
             $student->delete();
-        }elseif($request->student_type == 'foreign'){
+        }else{
             $student = ForeignStudents::findOrFail($request->id);
             $student->delete();
         }
