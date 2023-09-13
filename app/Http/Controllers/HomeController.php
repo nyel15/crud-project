@@ -26,13 +26,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index(Request $request)
-    {  
-        $students = [];
-        $allStudents = AllStudents::get();
-        foreach($allStudents as $student){
-            $localStudents = '';
-            $foreignStudents = '';
+    public function display(Request $request){
             $filter = $request->input('filter', 'all');
             if($request->filter == 'local'){
                 $students = LocalStudents::latest()->get();
@@ -43,8 +37,11 @@ class HomeController extends Controller
                 $foreignStudents = ForeignStudents::latest()->get();
                 $students = $localStudents->concat($foreignStudents);
             }
-        }
-        return view('home', compact('students')); 
+            return datatables()->of($students)->toJson();
+    }
+
+    public function index(){
+        return view('home');  
     }
     
     public function create(){
@@ -52,7 +49,10 @@ class HomeController extends Controller
     }
     
     public function store(StudentRequest $request){
-        $request->validated();
+        $validator = $request->validated();
+        if($validator->fails()){
+            return response()->json(['status' => 400, 'errors' => $validator->messages()]);
+        }
         
         if($request->student_type == 'local'){
             $localStudent = new LocalStudents();
