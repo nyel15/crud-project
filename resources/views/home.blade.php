@@ -32,7 +32,7 @@
     </form>
 </div>
 <div class="container students-container">
-    <h1>STUDENTS LIST</h1>
+    <h1>STUDENTS LISTasd</h1>
     <a href="{{ route('create') }}" class="btn btn-success mb-3">Add Student</a>
     <div class="row justify-content-center studentsContainer">
         <table class="table table-light">
