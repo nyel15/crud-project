@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AllStudents;
 use App\LocalStudents;
 use App\ForeignStudents;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StudentRequest;
 use Illuminate\Http\Request;
 
@@ -48,12 +49,26 @@ class HomeController extends Controller
         return view('create');
     }
     
-    public function store(StudentRequest $request){
-        $validator = $request->validated();
-        if($validator->fails()){
-            return response()->json(['status' => 400, 'errors' => $validator->messages()]);
-        }
+    public function store(Request $request){
+        $validator = Validator::make($request->all(),[
+            'student_type' => 'required',
+            'id_number' => 'required|numeric|digits_between:1,5|unique:local_students,id_number,1|unique:foreign_students,id_number,1',
+            'name' => 'required',
+            'age' => 'required|numeric|digits_between:1,2|regex:/^[^.]+$/',
+            'gender' => 'nullable',
+            'city' => 'required',
+            'mobile_number' => 'required|numeric|regex:/^(09)\\d{9}$/',
+            'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|email:rfc,dns',
+            'grades' => 'nullable|numeric|min:60|max:100'
+        ]);
         
+        if($validator->fails()){
+            return response()->json([
+                'status' => 400, 
+                'error' => $validator->messages()
+            ]);
+        }
+
         if($request->student_type == 'local'){
             $localStudent = new LocalStudents();
             $localStudent->student_type = $request->student_type;
@@ -86,7 +101,8 @@ class HomeController extends Controller
         $allStudent->student_type == 'foreign' ? $allStudent->foreign_student_id = $foreignStudent->id : '';
         $allStudent->save();
         
-        return redirect()->route('home')->with('status', 'create successful');
+        return redirect()->route('home');
+        
         }
 
     public function edit($student_type, $id){
@@ -98,7 +114,7 @@ class HomeController extends Controller
             $student = ForeignStudents::findOrFail($id);
         }
         
-        return view('update', compact('student'));
+        return response()->json($student);
     }
     
     public function update($id, $student_type, StudentRequest $request){
@@ -149,7 +165,7 @@ class HomeController extends Controller
             }
         }
         
-        return redirect()->route('home')->with('status', 'update successful');
+        return response()->json('test');
     }
 
     public function delete(Request $request){
@@ -161,7 +177,7 @@ class HomeController extends Controller
             $student->delete();
         }
         
-        return redirect()->route('home')->with('status', 'delete successful');
+        return response()->json();
     }
     
 }

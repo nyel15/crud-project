@@ -1,6 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Delete modal -->
+<div class="modal" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete?</p>
+        <input type="hidden" id="deleteId">
+        <input type="hidden" id="deleteType">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="deleteStudent">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter by student type -->
 <div class="m-auto col-3 text-center">
     <form method="GET" action="{{ route('home') }}" class="filterForm">
         <select class="form-select" name="filter" onchange="document.querySelector('.filterForm').submit();">
@@ -11,26 +33,31 @@
         </select>
     </form>
 </div>
-<div class="container students-container">
-    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+
+<div class="container" style="max-width:100rem;">
+    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#createModal">
         Add Student
     </button>
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <button type="button" class="btn btn-danger mb-2">
+        Delete selected students
+    </button>
+
+    <!-- Create form -->
+    <div class="modal fade" id="createModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title fs-5" id="staticBackdropLabel">Create Student</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <ul class="alert alert-danger d-none" id="save_errorlist"></ul>
                 <div class="modal-body">
-                    <ul class="alert alert-warning d-none" id="save_errorlist"></ul>
-                    <form action="{{ route('store') }}" method="POST" class="row g-3" id="create">
+                    <form method="POST" class="row g-3" id="createForm" action="{{ route('store') }}">
                         @csrf
                         <div class="col-6">
                             <label for="inputStudentType" class="form-label">Student type</label>
                             <select id="inputStudentType"
-                                class="form-select @error('student_type') border-danger @enderror" name="student_type">
+                                class="form-select"  name="student_type">
                                 <option disabled selected>Select student type</option>
                                 <option {{ old('student_type') == 'local' ? 'selected' : '' }}>local</option>
                                 <option {{ old('student_type') == 'foreign' ? 'selected' : '' }}>foreign</option>
@@ -38,17 +65,17 @@
                         </div>
                         <div class="col-6">
                             <label for="inputIdNumber" class="form-label">ID number</label>
-                            <input type="text" class="form-control @error('id_number') border-danger @enderror"
+                            <input type="text" class="form-control" 
                                 id="inputIdNumber" name="id_number" value="{{ old('id_number') }}">
                         </div>
                         <div class="col-6">
                             <label for="inputName" class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') border-danger @enderror"
+                            <input type="text" class="form-control"
                                 id="inputName" name="name" value="{{ old('name') }}">
                         </div>
                         <div class="col-2">
                             <label for="inputAge" class="form-label">Age</label>
-                            <input type="text" class="form-control @error('age') border-danger @enderror" id="inputAge"
+                            <input type="text" class="form-control" id="inputAge"
                                 name="age" value="{{ old('age') }}">
                         </div>
                         <div class="col-4">
@@ -61,35 +88,106 @@
                         </div>
                         <div class="col-6">
                             <label for="inputCity" class="form-label">City</label>
-                            <input type="text" class="form-control @error('city') border-danger @enderror"
+                            <input type="text" class="form-control"
                                 id="inputCity" name="city" value="{{ old('city') }}">
                         </div>
                         <div class="col-6">
                             <label for="inputMobileNumber" class="form-label">Mobile number</label>
-                            <input type="text" class="form-control @error('mobileNumber') border-danger @enderror"
+                            <input type="text" class="form-control"
                                 id="inputMobileNumber" name="mobile_number" value="{{ old('mobile_number') }}">
                         </div>
                         <div class="col-8">
                             <label for="inputEmail" class="form-label">Email</label>
-                            <input type="text" class="form-control @error('email') border-danger @enderror"
+                            <input type="text" class="form-control"
                                 id="inputEmail" name="email" value="{{ old('email') }}">
                         </div>
                         <div class="col-4">
                             <label for="inputGrades" class="form-label">Grades</label>
-                            <input type="text" class="form-control @error('grades') border-danger @enderror"
+                            <input type="text" class="form-control"
                                 id="inputGrades" name="grades" value="{{ old('grades') }}" placeholder="optional">
                         </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" name="create" id="insert">Insert</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-create-form">Close</button>
+                    <button type="button" class="btn btn-primary" name="submit" id="insert">Insert</button>
                 </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="row justify-content-center studentsContainer">
+    <!-- Update form -->
+    <div class="modal fade" id="updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="staticBackdropLabel">Update Student</h2>
+                </div>
+                <ul class="alert alert-danger d-none" id="save_errorlist"></ul>
+                <div class="modal-body">
+                    <form method="POST" class="row g-3" id="updateForm" action="">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="updateIdEdit">
+                        <input type="hidden" id="updateTypeEdit">
+                        <div class="col-6">
+                            <label for="inputStudentType" class="form-label">Student type</label>
+                            <select id="inputStudentTypeEdit"
+                                class="form-select"  name="student_type">
+                                <option disabled selected>Select student type</option>
+                                <option {{ old('student_type') == 'local' ? 'selected' : '' }}>local</option>
+                                <option {{ old('student_type') == 'foreign' ? 'selected' : '' }}>foreign</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="inputIdNumber" class="form-label">ID number</label>
+                            <input type="text" class="form-control" id="inputIdNumberEdit" name="id_number" value="{{ old('id_number') }}">
+                        </div>
+                        <div class="col-6">
+                            <label for="inputName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="inputNameEdit" name="name" value="{{ old('name') }}">
+                        </div>
+                        <div class="col-2">
+                            <label for="inputAge" class="form-label">Age</label>
+                            <input type="text" class="form-control"  id="inputAgeEdit" name="age" value="{{ old('age') }}">
+                        </div>
+                        <div class="col-4">
+                            <label for="inputGender" class="form-label">Gender</label>
+                            <select id="inputGenderEdit" class="form-select" name="gender" value="{{ old('gender') }}">
+                                <option disabled selected>optional</option>
+                                <option {{ old('gender') == 'male' ? 'selected' : ''}}>male</option>
+                                <option {{ old('gender') == 'female' ? 'selected' : ''}}>female</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="inputCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="inputCityEdit" name="city" value="{{ old('city') }}">
+                        </div>
+                        <div class="col-6">
+                            <label for="inputMobileNumber" class="form-label">Mobile number</label>
+                            <input type="text" class="form-control" id="inputMobileNumberEdit" name="mobile_number" value="{{ old('mobile_number') }}">
+                        </div>
+                        <div class="col-8">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="inputEmailEdit" name="email" value="{{ old('email') }}">
+                        </div>
+                        <div class="col-4">
+                            <label for="inputGrades" class="form-label">Grades</label>
+                            <input type="text" class="form-control" id="inputGradesEdit" name="grades" value="{{ old('grades') }}" placeholder="optional">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-update-form">Close</button>
+                    <button type="button" class="btn btn-primary" name="submit" id="updateStudentRecord">Update</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data table -->
+    <div class="row justify-content-center">
         <table class="cell-border" id="student-table">
             <thead>
                 <tr>
@@ -104,6 +202,7 @@
                     <th scope="col">EMAIL</th>
                     <th scope="col">ACTIONS</th>
                     <th scope="col"></th>
+                    <th scope="col" style="width:12px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -111,6 +210,7 @@
         </table>
     </div>
 </div>
+
 <script>
 $(function() {
     new DataTable('#student-table', {
@@ -123,99 +223,182 @@ $(function() {
             }
         },
         method: 'GET',
-        columns: [{
-                data: 'student_type',
-                name: 'student_type'
-            },
-            {
-                data: 'id_number',
-                name: 'id_number'
-            },
-            {
-                data: 'name',
-                name: 'name'
-            },
-            {
-                data: 'age',
-                name: 'age'
-            },
-            {
-                data: 'gender',
-                name: 'gender'
-            },
-            {
-                data: 'city',
-                name: 'city'
-            },
-            {
-                data: 'mobile_number',
-                name: 'mobile_number'
-            },
-            {
-                data: 'grades',
-                name: 'grades',
-                render: function(data, type, row) {
+        columns: [
+            {data: 'student_type'},
+            {data: 'id_number'},
+            {data: 'name'},
+            {data: 'age'},
+            {data: 'gender'},
+            {data: 'city'},
+            {data: 'mobile_number'},
+            {data: 'grades',
+                render: function(data, type) {
                     if (type === 'display') {
                         return parseFloat(data).toFixed(2);
                     }
                     return data;
                 }
             },
-            {
-                data: 'email',
-                name: 'email'
-            },
-        ]
+            {data: 'email'},
+            {data: null,
+                render: function(data, type, full, meta){
+                    return '<div><button id="updateBtn" class="btn btn-primary col-12" value="' + data.student_type + '/' + data.id +'">Update</button></div>';
+            }},
+            {data: null,
+                render: function(data, type, full, meta){
+                    return '<div><button id="deleteBtn" class="btn btn-danger col-12 delete-button" data-id="' + data.student_type + '/' + data.id + '">Delete</button></div>';
+            }},
+            {data: null,
+                render: function(data, type, full, meta){
+                    return '<input class="form-check-input m-auto checkboxNoLabel" type="checkbox" value="" aria-label="..."> ';
+            }}
+        ],
+        columnDefs:[{
+            targets: [9, 10, 11],
+            orderable: false
+        }]
     });
 });
-$(function() {
-    $('#insert').on('click', function() {
-        $('#create').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: '{{ route("store") }}',
-                data: $('#create').serialize(),
-                headers: {
-                    'X-CSRF-TOKEN': 'csrf-token'
-                },
+//Insert Data
+$(document).on("submit", "#createForm", function (e) {
+    e.preventDefault();
 
-                success: function(response) {
-                    if (response.status == 400) {
-                        $('#save_errorlist').html("");
-                        $('#save_errorlist').removeClass("d-none");
-                        $.each(response.error, function(key, error_value) {
-                            $('#save_errorlist').append('<li>' +
-                                error_value + '</li>')
-                        });
-                    }
-                    elseif(response.status == 200) {
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            icon: 'success',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, create it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                Swal.fire(
-                                    'insert success!',
-                                    'Your record has been saved.',
-                                    'success'
-                                )
-                            }
-                        })
-                        $('.modal').hide();
-                        $('.modal-backdrop').removeClass('show');
-                        $('#student-table').DataTable().ajax.reload();
-                    }
-
-                }
-
-            });
-        });
+    let formData = new FormData($("#createForm")[0]);
+    $.ajax({
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        type: "POST",
+        url: '{{ route("store") }}',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (response.status == 400) {
+                $("#save_errorlist").html("");
+                $("#save_errorlist").removeClass("d-none");
+                $.each(response.error, function (key, error_value) {
+                    $("#save_errorlist").append("<li>" + error_value + "</li>");
+                });
+            }else{
+                Swal.fire(
+                    "created successful!", 
+                    "", 
+                    "success");
+                $("#createForm").find("input").val("");
+                $("#createModal").modal("hide");
+                $("#student-table").DataTable().ajax.reload();
+            }
+        }
     });
+});
+
+//Resetting Create Modal
+$(function () {
+    $("#close-create-form").click(function () {
+        $("#createForm").find("input").val("");
+        $("#save_errorlist").addClass("d-none");
+    });
+});
+
+//Delete Data
+$(document).on('click', '#deleteBtn', function() {
+    $('#deleteModal').modal('show');
+    let rowId = $(this).data('id');
+    $.ajax({
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        url: 'edit' + '/' + rowId,
+        type: 'GET',
+        success: function(response) {
+            $('#deleteId').val(response.id);
+            $('#deleteType').val(response.student_type);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request failed: ' + error);
+        }
+    });
+});
+
+$(document).on('click', '#deleteStudent', function() {
+    $.ajax({
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        url: '{{ route("delete") }}',
+        type: 'DELETE',
+        data: {student_type: $('#deleteType').val(), id: $('#deleteId').val()},
+        success: function(response) {
+            Swal.fire(
+            'Student Record Deleted!',
+            '',
+            'success'
+            )
+            $('#deleteModal').modal('hide');
+            $("#student-table").DataTable().ajax.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request failed: ' + error);
+        }
+    });
+});
+
+//Update Data
+$(document).on('click', '#updateBtn', function() {
+    let rowId = $(this).val();
+    $('#updateModal').modal('show');
+    $.ajax({
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        url: 'edit' + '/' + rowId,
+        type: 'GET',
+        success: function(data){
+            $('#updateIdEdit').val(data.id);
+            $('#updateTypeEdit').val(data.student_type);
+            const formattedGrade = Number(data.grades).toFixed(2);
+            $('#inputStudentTypeEdit').val(data.student_type);
+            $('#inputIdNumberEdit').val(data.id_number);
+            $('#inputNameEdit').val(data.name);
+            $('#inputAgeEdit').val(data.age);
+            $('#inputGenderEdit').val(data.gender);
+            $('#inputCityEdit').val(data.city);
+            $('#inputMobileNumberEdit').val(data.mobile_number);
+            $('#inputEmailEdit').val(data.email);
+            $('#inputGradesEdit').val(formattedGrade);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request failed: ' + error);
+        }
+    })
+});
+
+$(document).on('click', '#updateStudentRecord', function() {
+    let id = $('#updateIdEdit').val();
+    let type = $('#updateTypeEdit').val();
+    $.ajax({
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        url: '/update/' + id + '/' + type,
+        type: 'PUT',
+        data: {
+            student_type: $('#inputStudentTypeEdit').val(), 
+            id_number: $('#inputIdNumberEdit').val(),
+            name: $('#inputNameEdit').val(),
+            age: $('#inputAgeEdit').val(),
+            gender: $('#inputGenderEdit').val(),
+            city: $('#inputCityEdit').val(),
+            mobile_number: $('#inputMobileNumberEdit').val(),
+            email: $('#inputEmailEdit').val(),
+            grades: $('#inputGradesEdit').val()
+        },
+        success: function(response){
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'student record has been updated',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            $('#updateModal').modal('hide');
+            $("#student-table").DataTable().ajax.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request failed: ' + error);
+        }
+    })
 });
 </script>
 @endsection
