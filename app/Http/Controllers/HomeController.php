@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AllStudents;
 use App\LocalStudents;
 use App\ForeignStudents;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StudentRequest;
 use Illuminate\Http\Request;
@@ -44,22 +45,18 @@ class HomeController extends Controller
     public function index(){
         return view('home');  
     }
-    
-    public function create(){
-        return view('create');
-    }
-    
+
     public function store(Request $request){
         $validator = Validator::make($request->all(),[
-            'student_type' => 'required',
-            'id_number' => 'required|numeric|digits_between:1,5|unique:local_students,id_number,1|unique:foreign_students,id_number,1',
-            'name' => 'required',
-            'age' => 'required|numeric|digits_between:1,2|regex:/^[^.]+$/',
-            'gender' => 'nullable',
-            'city' => 'required',
-            'mobile_number' => 'required|numeric|regex:/^(09)\\d{9}$/',
-            'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|email:rfc,dns',
-            'grades' => 'nullable|numeric|min:60|max:100'
+            'student_type' => 'bail|required',
+            'id_number' => 'bail|required|numeric|digits_between:1,5|unique:local_students,id_number|unique:foreign_students,id_number',
+            'name' => 'bail|required',
+            'age' => 'bail|required|numeric|digits_between:1,2|regex:/^[^.]+$/',
+            'gender' => 'bail|nullable',
+            'city' => 'bail|required',
+            'mobile_number' => 'bail|required|numeric|regex:/^(09)\\d{9}$/',
+            'email' => 'bail|required|email:rfc,dns',
+            'grades' => 'bail|nullable|numeric|min:60|max:100'
         ]);
         
         if($validator->fails()){
@@ -117,8 +114,32 @@ class HomeController extends Controller
         return response()->json($student);
     }
     
-    public function update($id, $student_type, StudentRequest $request){
-        $request->validated();
+    public function update(Request $request, $id, $student_type){
+        $validator = Validator::make($request->all(),[
+            'student_type' => 'bail|required',
+            'id_number' => [
+                'bail',
+                'required',
+                'numeric',
+                'digits_between:1,5',
+                Rule::unique('local_students', 'id_number')->ignore($id),
+                Rule::unique('foreign_students', 'id_number')->ignore($id),
+            ],
+            'name' => 'bail|required',
+            'age' => 'bail|required|numeric|digits_between:1,2|regex:/^[^.]+$/',
+            'gender' => 'bail|nullable',
+            'city' => 'bail|required',
+            'mobile_number' => 'bail|required|numeric|regex:/^(09)\\d{9}$/',
+            'email' => 'bail|required|email:rfc,dns',
+            'grades' => 'bail|nullable|numeric|min:60|max:100'
+        ]);
+        
+        if($validator->fails()){
+            return response()->json([
+                'status' => 400, 
+                'error' => $validator->messages()
+            ]);
+        }
 
         if($student_type == 'local'){
             $student = LocalStudents::findOrFail($id);
@@ -165,7 +186,7 @@ class HomeController extends Controller
             }
         }
         
-        return response()->json('test');
+        return response()->json(['message' => 'Student updated successfully']);
     }
 
     public function delete(Request $request){
@@ -176,8 +197,21 @@ class HomeController extends Controller
             $student = ForeignStudents::findOrFail($request->id);
             $student->delete();
         }
-        
+
         return response()->json();
     }
-    
+
+    public function selectDelete($id_number, Request $request){
+        $arr = explode(',', $id_number);
+        foreach ($arr as $value){
+            $localStudent = LocalStudents::where('id_number', $value)->first();
+            $foreignStudent = ForeignStudents::where('id_number', $value)->first();
+            if($localStudent){
+                $localStudent->delete();
+            }else{
+                $foreignStudent->delete();
+            }
+        }
+          return response()->json(['message' => 'Student deleted successfully']);
+    }
 }
